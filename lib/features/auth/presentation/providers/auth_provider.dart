@@ -39,6 +39,7 @@ class AuthController extends _$AuthController {
     required String fullName,
     required String email,
     required String password,
+    required String role,
   }) async {
     state = const AsyncLoading();
     final repo = ref.read(authRepositoryProvider);
@@ -47,6 +48,7 @@ class AuthController extends _$AuthController {
         email: email,
         password: password,
         fullName: fullName,
+        role: role,
       );
     });
   }

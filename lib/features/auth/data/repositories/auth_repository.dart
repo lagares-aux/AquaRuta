@@ -20,23 +20,18 @@ class AuthRepository {
     required String email,
     required String password,
     required String fullName,
+    required String role,
   }) async {
     final response = await _client.auth.signUp(
       email: email,
       password: password,
+      data: <String, dynamic>{
+        'full_name': fullName,
+        'role': role,
+      },
     );
 
-    final user = response.user;
-    if (user != null) {
-      // Crear el perfil asociado en public.profiles
-      await _client.from('profiles').insert({
-        'id': user.id,
-        'full_name': fullName,
-        'role': 'passenger',
-      });
-    }
-
-    return user;
+    return response.user;
   }
 
   Future<void> signOut() async {

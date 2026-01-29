@@ -17,6 +17,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _passwordController = TextEditingController();
 
   bool _isSubmitting = false;
+  bool _showPassword = false;
 
   @override
   void dispose() {
@@ -119,11 +120,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_showPassword,
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _showPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _showPassword = !_showPassword;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {
@@ -163,6 +176,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                           )
                         : const Text('Ingresar'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _isSubmitting ? null : () {},
+                    icon: Image.asset(
+                      'assets/google_logo.png',
+                      height: 20,
+                    ),
+                    label: const Text('Ingresar con Google'),
                   ),
                 ),
                 const SizedBox(height: 16),

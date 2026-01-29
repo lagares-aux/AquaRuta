@@ -18,6 +18,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _passwordController = TextEditingController();
 
   bool _isSubmitting = false;
+  bool _showPassword = false;
+  String? _selectedRole; // 'passenger' o 'operator'
 
   @override
   void dispose() {
@@ -30,6 +32,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (_selectedRole == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Selecciona un rol para continuar'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isSubmitting = true;
     });
@@ -41,6 +53,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         fullName: _fullNameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+        role: _selectedRole!,
       );
 
       final state = ref.read(authControllerProvider);
@@ -96,6 +109,76 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedRole = 'passenger';
+                          });
+                        },
+                        child: Card(
+                          color: _selectedRole == 'passenger'
+                              ? colorScheme.primary.withOpacity(0.1)
+                              : null,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: _selectedRole == 'passenger'
+                                  ? colorScheme.primary
+                                  : Colors.grey.shade300,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: const [
+                                Icon(Icons.backpack),
+                                SizedBox(height: 8),
+                                Text('Soy Pasajero'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedRole = 'operator';
+                          });
+                        },
+                        child: Card(
+                          color: _selectedRole == 'operator'
+                              ? colorScheme.primary.withOpacity(0.1)
+                              : null,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: _selectedRole == 'operator'
+                                  ? colorScheme.primary
+                                  : Colors.grey.shade300,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: const [
+                                Icon(Icons.anchor),
+                                SizedBox(height: 8),
+                                Text('Soy Lanchero'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
                 Form(
                   key: _formKey,
                   child: Column(
@@ -138,11 +221,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: !_showPassword,
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _showPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _showPassword = !_showPassword;
+                              });
+                            },
                           ),
                         ),
                         validator: (value) {
@@ -182,6 +277,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                             ),
                           )
                         : const Text('Crear Cuenta'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _isSubmitting ? null : () {},
+                    icon: Image.asset(
+                      'assets/google_logo.png',
+                      height: 20,
+                    ),
+                    label: const Text('Registrarse con Google'),
                   ),
                 ),
                 const SizedBox(height: 16),
