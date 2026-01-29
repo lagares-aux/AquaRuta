@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   db:
-    image: supabase/postgres:15.1.0.89
+    image: supabase/postgres:latest
     container_name: aquaruta-db
     restart: unless-stopped
     env_file:
@@ -13,7 +13,7 @@ services:
       - db-data:/var/lib/postgresql/data
 
   auth:
-    image: supabase/gotrue:v2.143.2
+    image: supabase/gotrue:latest
     container_name: aquaruta-auth
     restart: unless-stopped
     depends_on:
@@ -24,7 +24,7 @@ services:
       - "9999:9999"
 
   rest:
-    image: postgrest/postgrest:v12.2.3
+    image: postgrest/postgrest:latest
     container_name: aquaruta-rest
     restart: unless-stopped
     depends_on:
@@ -35,7 +35,7 @@ services:
       - "3001:3000"
 
   realtime:
-    image: supabase/realtime:v2.25.55
+    image: supabase/realtime:latest
     container_name: aquaruta-realtime
     restart: unless-stopped
     depends_on:
@@ -46,7 +46,7 @@ services:
       - "4000:4000"
 
   storage:
-    image: supabase/storage-api:v0.42.8
+    image: supabase/storage-api:latest
     container_name: aquaruta-storage
     restart: unless-stopped
     depends_on:
@@ -58,7 +58,7 @@ services:
       - "5000:5000"
 
   meta:
-    image: supabase/postgres-meta:v0.80.0
+    image: supabase/postgres-meta:latest
     container_name: aquaruta-meta
     restart: unless-stopped
     depends_on:
@@ -69,7 +69,7 @@ services:
       - "8080:8080"
 
   studio:
-    image: supabase/studio:20250107-4b06c71
+    image: supabase/studio:latest
     container_name: aquaruta-studio
     restart: unless-stopped
     depends_on:
