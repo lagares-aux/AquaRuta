@@ -15,9 +15,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-  
-  // false = Pasajero, true = Lanchero
-  bool _isOperatorMode = false;
 
   @override
   void dispose() {
@@ -47,7 +44,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(authControllerProvider);
 
-    // Escuchar cambios de estado para feedback
     ref.listen<AsyncValue>(authControllerProvider, (previous, next) {
       if (next is AsyncError) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -60,42 +56,36 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       }
     });
 
-    // Colores dinámicos según el modo
-    final primaryColor = _isOperatorMode 
-        ? const Color(0xFF003366) // Navy para Lanchero
-        : const Color(0xFF006994); // Azul Océano para Pasajero
-    
-    final accentColor = _isOperatorMode
-        ? const Color(0xFFFF5722) // Naranja rescate
-        : const Color(0xFF40E0D0); // Turquesa
+    // Colores de Marca
+    const primaryColor = Color(0xFF006994); 
+    const accentColor = Color(0xFF40E0D0);
 
     return Scaffold(
       body: Stack(
         children: [
-          // 1. Fondo con Gradiente Animado (Simulado)
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            decoration: BoxDecoration(
+          // 1. Fondo Gradiente
+          Container(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
                   primaryColor,
-                  primaryColor.withOpacity(0.8),
-                  accentColor.withOpacity(0.6),
+                  Color(0xFF005073), // Un azul un poco más oscuro
+                  accentColor,
                 ],
               ),
             ),
           ),
 
-          // Patrón de fondo (Opcional, ondas)
+          // Patrón de fondo
           Positioned(
             top: -100,
-            right: -100,
+            left: -100,
             child: Icon(
-              Icons.blur_on,
+              Icons.water_drop,
               size: 400,
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withOpacity(0.05),
             ),
           ),
 
@@ -106,17 +96,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo / Icono
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
+                  // Logo
+                  Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
                     ),
-                    child: Icon(
-                      _isOperatorMode ? Icons.anchor : Icons.directions_boat_filled,
+                    child: const Icon(
+                      Icons.anchor,
                       size: 60,
                       color: Colors.white,
                     ),
@@ -125,6 +114,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   
                   Text(
                     'Bienvenido a AquaRuta',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -132,7 +122,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ),
                   Text(
-                    _isOperatorMode ? 'Portal de Capitanes' : 'Tu viaje comienza aquí',
+                    'Tu conexión con la isla',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.white.withOpacity(0.9),
@@ -140,7 +130,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                   const SizedBox(height: 40),
 
-                  // 3. Tarjeta de Login (Glassmorphism)
+                  // 3. Tarjeta Glassmorphism
                   Container(
                     padding: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
@@ -156,75 +146,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     child: Column(
                       children: [
-                        // Selector de Rol (Sliding Switch)
-                        Container(
-                          height: 50,
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return Stack(
-                                children: [
-                                  // El indicador animado (Pill)
-                                  AnimatedAlign(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                    alignment: _isOperatorMode 
-                                        ? Alignment.centerRight 
-                                        : Alignment.centerLeft,
-                                    child: Container(
-                                      width: constraints.maxWidth / 2,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(25),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
-                                            blurRadius: 4,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  // Textos
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => setState(() => _isOperatorMode = false),
-                                          child: Center(
-                                            child: Text(
-                                              'Pasajero',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: !_isOperatorMode ? primaryColor : Colors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => setState(() => _isOperatorMode = true),
-                                          child: Center(
-                                            child: Text(
-                                              'Lanchero',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: _isOperatorMode ? primaryColor : Colors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              );
-                            },
+                        Text(
+                          'Iniciar Sesión',
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 30),
@@ -234,7 +161,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           controller: _emailController,
                           decoration: InputDecoration(
                             labelText: 'Correo Electrónico',
-                            prefixIcon: Icon(Icons.email_outlined, color: primaryColor),
+                            prefixIcon: const Icon(Icons.email_outlined, color: primaryColor),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(15),
                               borderSide: BorderSide.none,
@@ -249,7 +176,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           obscureText: !_isPasswordVisible,
                           decoration: InputDecoration(
                             labelText: 'Contraseña',
-                            prefixIcon: Icon(Icons.lock_outline, color: primaryColor),
+                            prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
@@ -269,11 +196,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Próximamente: Recuperar contraseña')),
-                              );
-                            },
+                            onPressed: () {},
                             child: Text(
                               '¿Olvidaste tu contraseña?',
                               style: TextStyle(color: Colors.grey[600], fontSize: 12),
@@ -283,7 +206,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                         const SizedBox(height: 20),
 
-                        // Botón de Login
+                        // Botón
                         SizedBox(
                           width: double.infinity,
                           height: 55,
@@ -292,9 +215,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                               elevation: 5,
                               shadowColor: primaryColor.withOpacity(0.4),
                             ),
@@ -331,7 +252,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         
                         const SizedBox(height: 20),
 
-                        // Botón Google (Placeholder)
+                        // Google Button
                         OutlinedButton.icon(
                           onPressed: () {},
                           icon: const Icon(Icons.g_mobiledata, size: 30),
@@ -339,9 +260,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.black87,
                             side: BorderSide(color: Colors.grey[300]!),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                           ),
                         ),
@@ -351,7 +270,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                   const SizedBox(height: 30),
                   
-                  // Footer Registro
+                  // Footer
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -361,7 +280,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                       GestureDetector(
                         onTap: () => context.push('/register'),
-                        child: Text(
+                        child: const Text(
                           'Regístrate aquí',
                           style: TextStyle(
                             color: Colors.white,
