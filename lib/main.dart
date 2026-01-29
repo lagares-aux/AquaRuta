@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants.dart';
+import 'core/utils/router_stream.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
@@ -46,8 +47,9 @@ class MyApp extends ConsumerWidget {
         ),
       ],
       redirect: (context, state) {
-        final loggingIn = state.subloc == '/login';
-        final registering = state.subloc == '/register';
+        final location = state.uri.toString();
+        final loggingIn = location == '/login';
+        final registering = location == '/register';
 
         // Mientras el estado de auth está cargando, no redirigir.
         if (authAsync.isLoading) {
