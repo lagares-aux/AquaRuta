@@ -37,7 +37,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
 
-    ref.read(authControllerProvider.notifier).login(
+    ref.read(authControllerProvider.notifier).signIn(
           email: email,
           password: password,
         );
@@ -292,7 +292,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
-                              shape: BorderRadius.circular(15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                               elevation: 5,
                               shadowColor: primaryColor.withOpacity(0.4),
                             ),
@@ -337,7 +339,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.black87,
                             side: BorderSide(color: Colors.grey[300]!),
-                            shape: BorderRadius.circular(15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                           ),
                         ),

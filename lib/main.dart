@@ -29,12 +29,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Escuchamos el estado de autenticación
-    final authState = ref.watch(authStateProvider);
-
     final router = GoRouter(
       initialLocation: '/',
-      refreshListenable: GoRouterRefreshStream(authState.stream),
+      refreshListenable: GoRouterRefreshStream(Supabase.instance.client.auth.onAuthStateChange),
       redirect: (context, state) {
         final session = Supabase.instance.client.auth.currentSession;
         final loggingIn = state.uri.toString() == '/login';
