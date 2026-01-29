@@ -20,15 +20,52 @@ class TripModel {
   });
 
   factory TripModel.fromJson(Map<String, dynamic> json) {
+    // Campos obligatorios básicos: se asume que vienen siempre desde Supabase.
+    final id = json['id']?.toString() ?? '';
+    final boatId = json['boat_id']?.toString() ?? '';
+    final origin = json['origin']?.toString() ?? '';
+    final destination = json['destination']?.toString() ?? '';
+
+    // departure_time: puede venir como String o ya como DateTime según el cliente.
+    final rawDepartureTime = json['departure_time'];
+    final DateTime departureTime;
+    if (rawDepartureTime is String) {
+      departureTime = DateTime.tryParse(rawDepartureTime) ?? DateTime.now();
+    } else if (rawDepartureTime is DateTime) {
+      departureTime = rawDepartureTime;
+    } else {
+      departureTime = DateTime.now();
+    }
+
+    // status con valor por defecto.
+    final status = (json['status'] ?? 'scheduled').toString();
+
+    // available_seats con valor por defecto 0 si viene nulo o en formato extraño.
+    final dynamic rawSeats = json['available_seats'];
+    final int availableSeats;
+    if (rawSeats is num) {
+      availableSeats = rawSeats.toInt();
+    } else if (rawSeats is String) {
+      availableSeats = int.tryParse(rawSeats) ?? 0;
+    } else {
+      availableSeats = 0;
+    }
+
+    // boat_name: no viene en la tabla trips básica; usar valor por defecto si falta.
+    final String boatName =
+        (json.containsKey('boat_name') && json['boat_name'] != null)
+            ? json['boat_name'].toString()
+            : 'Lancha';
+
     return TripModel(
-      id: json['id'] as String,
-      boatId: json['boat_id'] as String,
-      origin: json['origin'] as String,
-      destination: json['destination'] as String,
-      departureTime: DateTime.parse(json['departure_time'] as String),
-      status: json['status'] as String,
-      availableSeats: (json['available_seats'] as num).toInt(),
-      boatName: json['boat_name'] as String?,
+      id: id,
+      boatId: boatId,
+      origin: origin,
+      destination: destination,
+      departureTime: departureTime,
+      status: status,
+      availableSeats: availableSeats,
+      boatName: boatName,
     );
   }
 
