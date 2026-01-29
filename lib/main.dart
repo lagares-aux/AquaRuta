@@ -9,7 +9,9 @@ import 'core/utils/router_stream.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
+import 'features/trips/data/models/trip_model.dart';
 import 'features/trips/presentation/pages/home_page.dart';
+import 'features/trips/presentation/pages/trip_details_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +46,16 @@ class MyApp extends ConsumerWidget {
         GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterPage(),
+        ),
+        GoRoute(
+          path: '/trip-details',
+          builder: (context, state) {
+            final extra = state.extra;
+            if (extra is! TripModel) {
+              return const HomePage();
+            }
+            return TripDetailsPage(trip: extra);
+          },
         ),
       ],
       redirect: (context, state) {
