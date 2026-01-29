@@ -29,9 +29,6 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authAsync = ref.watch(authStateProvider);
-    final user = authAsync.value;
-
     final router = GoRouter(
       initialLocation: '/',
       routes: [
@@ -58,33 +55,6 @@ class MyApp extends ConsumerWidget {
           },
         ),
       ],
-      redirect: (context, state) {
-        final location = state.uri.toString();
-        final loggingIn = location == '/login';
-        final registering = location == '/register';
-
-        // Mientras el estado de auth está cargando, no redirigir.
-        if (authAsync.isLoading) {
-          return null;
-        }
-
-        if (user == null) {
-          // No autenticado: solo permitir login y register.
-          if (!loggingIn && !registering) {
-            return '/login';
-          }
-          return null;
-        }
-
-        // Autenticado: evitar login/register.
-        if (loggingIn || registering) {
-          return '/';
-        }
-
-        return null;
-      },
-      refreshListenable:
-          GoRouterRefreshStream(ref.watch(authStateProvider.stream)),
     );
 
     final colorScheme = ColorScheme.fromSeed(

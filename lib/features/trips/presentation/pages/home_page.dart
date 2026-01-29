@@ -4,16 +4,38 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../providers/trips_provider.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  bool isOperatorMode = false;
+
+  @override
+  Widget build(BuildContext context) {
     final tripsAsync = ref.watch(tripsStreamProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('AquaRuta 🌊'),
+        actions: [
+          Row(
+            children: [
+              const Text('Modo Lanchero'),
+              Switch(
+                value: isOperatorMode,
+                onChanged: (value) {
+                  setState(() {
+                    isOperatorMode = value;
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
       ),
       body: tripsAsync.when(
         loading: () => const Center(
@@ -32,6 +54,8 @@ class HomePage extends ConsumerWidget {
               child: Text('No hay viajes programados por el momento.'),
             );
           }
+
+          final operatorMode = isOperatorMode;
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -72,21 +96,31 @@ class HomePage extends ConsumerWidget {
                       Text('Estado: $status'),
                     ],
                   ),
-                  trailing: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: seatsColor,
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${trip.availableSeats}',
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: seatsColor,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${trip.availableSeats}',
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
+                      if (operatorMode)
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Icon(Icons.edit),
+                        ),
+                    ],
                   ),
                 ),
               );
@@ -94,6 +128,16 @@ class HomePage extends ConsumerWidget {
           );
         },
       ),
+      floatingActionButton: isOperatorMode
+          ? FloatingActionButton(
+              onPressed: () {
+                // Modo desarrollo: solo imprimir en consola.
+                // ignore: avoid_print
+                print('Crear Viaje');
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

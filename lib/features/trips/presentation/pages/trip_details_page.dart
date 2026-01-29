@@ -19,20 +19,9 @@ class TripDetailsPage extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     Future<void> onBook() async {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Debes iniciar sesión para reservar.'),
-            backgroundColor: colorScheme.error,
-          ),
-        );
-        return;
-      }
-
       await ref
           .read(bookingControllerProvider.notifier)
-          .bookTrip(tripId: trip.id, userId: user.id);
+          .bookTrip(tripId: trip.id, userId: 'dev-user-id');
 
       final state = ref.read(bookingControllerProvider);
       if (state.hasError) {
