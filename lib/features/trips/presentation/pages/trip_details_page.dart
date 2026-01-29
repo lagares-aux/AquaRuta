@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/utils/date_formatter.dart';
+import 'package:aquaruta/core/utils/date_formatter.dart';
 import '../../data/models/trip_model.dart';
 import '../providers/trips_provider.dart';
 

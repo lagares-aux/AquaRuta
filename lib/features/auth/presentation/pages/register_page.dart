@@ -86,14 +86,25 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF006994),
+              Color(0xFF40E0D0),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 Text(
                   'Crear cuenta',
                   textAlign: TextAlign.center,
@@ -187,8 +198,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         controller: _fullNameController,
                         decoration: InputDecoration(
                           labelText: 'Nombre completo',
+                          prefixIcon: const Icon(Icons.person_outline),
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
                           ),
                         ),
                         validator: (value) {
@@ -204,8 +219,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Email',
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
                           ),
                         ),
                         validator: (value) {
@@ -224,8 +243,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         obscureText: !_showPassword,
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(

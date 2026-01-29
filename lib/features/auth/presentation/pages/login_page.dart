@@ -71,14 +71,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF006994),
+              Color(0xFF40E0D0),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 Text(
                   'AquaRuta',
                   textAlign: TextAlign.center,
@@ -103,8 +114,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Email',
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
                           ),
                         ),
                         validator: (value) {
@@ -123,8 +138,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         obscureText: !_showPassword,
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -160,9 +179,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+                      shape: const StadiumBorder(),
+                      elevation: 4,
                     ),
                     child: _isSubmitting
                         ? const SizedBox(
@@ -197,8 +215,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   },
                   child: const Text('¿No tienes cuenta? Regístrate'),
                 ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    // TODO: implementar flujo de recuperación de contraseña
+                  },
+                  child: const Text('Olvidé mi contraseña'),
+                ),
               ],
             ),
+          ),
           ),
         ),
       ),
