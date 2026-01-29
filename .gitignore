@@ -1,0 +1,49 @@
+# Flutter / Dart
+**/build/
+**/.dart_tool/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.flutter-plugins-dependencies
+**/.metadata
+**/pubspec.lock
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# IDE / Editor
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS / System files
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Logs
+*.log
+logs/
+
+# Environment / Secrets
+.env
+.env.*
+
+# Docker
+volumes/
+**/volumes/
+**/docker-data/
+
+# Node / Web (por si usas herramientas web para la PWA)
+node_modules/
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Others
+*.swp
+*.swo
