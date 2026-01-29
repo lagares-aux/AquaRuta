@@ -20,7 +20,7 @@ services:
     env_file:
       - .env
     environment:
-      GOTRUE_DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      GOTRUE_DATABASE_URL: "postgres://supabase_auth_admin:postgres@db:5432/postgres"
     ports:
       - "9999:9999"
 
@@ -43,6 +43,8 @@ services:
       - db
     env_file:
       - .env
+    environment:
+      RLIMIT_NOFILE: 65536
     ulimits:
       nofile:
         soft: 65536
@@ -60,7 +62,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: "postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      DATABASE_URL: "postgres://supabase_storage_admin:postgres@db:5432/postgres"
     ports:
       - "5000:5000"
 
