@@ -4,87 +4,145 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart'; // Asegúrate de tener intl en pubspec.yaml
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/providers/user_provider.dart';
 import '../../data/models/trip_model.dart';
 import '../providers/trips_provider.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(userProfileProvider);
 
-class _HomePageState extends ConsumerState<HomePage> {
-  // Estado local para el modo desarrollo
-  bool isOperatorMode = false;
+    return userAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(child: Text('Error al cargar perfil: $error')),
+      ),
+      data: (userProfile) {
+        final tripsAsync = ref.watch(tripsStreamProvider);
+        final isOperator = userProfile.role == 'operator';
 
-  @override
-  Widget build(BuildContext context) {
-    final tripsAsync = ref.watch(tripsStreamProvider);
+        String initialsFromName(String name) {
+          if (name.trim().isEmpty) return '?';
+          final parts = name.trim().split(' ');
+          if (parts.length == 1) {
+            return parts.first.isNotEmpty ? parts.first[0].toUpperCase() : '?';
+          }
+          return (parts[0].isNotEmpty ? parts[0][0] : '') +
+              (parts[1].isNotEmpty ? parts[1][0] : '');
+        }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA), // Fondo gris muy claro
-      appBar: AppBar(
-        title: Text(
-          'AquaRuta 🌊',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          // Switch de Modo Desarrollador
-          Row(
-            children: [
-              Text(
-                isOperatorMode ? 'Lanchero' : 'Pasajero',
-                style: const TextStyle(fontSize: 12),
-              ),
-              Switch(
-                value: isOperatorMode,
-                activeColor: Colors.white,
-                activeTrackColor: const Color(0xFF40E0D0), // Turquesa
-                onChanged: (value) {
-                  setState(() {
-                    isOperatorMode = value;
-                  });
-                },
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F7FA), // Fondo gris muy claro
+          appBar: AppBar(
+            title: Text(
+              'AquaRuta 🌊',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          title: const Text('Mi Perfil'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userProfile.fullName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(userProfile.email),
+                            ],
+                          ),
+                          actions: [
+                            TextButton.icon(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                await ref
+                                    .read(authRepositoryProvider)
+                                    .signOut();
+                              },
+                              icon: const Icon(
+                                Icons.logout,
+                                color: Colors.red,
+                              ),
+                              label: const Text(
+                                'Cerrar sesión',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: CircleAvatar(
+                    backgroundColor: const Color(0xFF006994),
+                    child: Text(
+                      initialsFromName(userProfile.fullName).toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(width: 10),
-        ],
-      ),
-      body: tripsAsync.when(
-        data: (trips) {
-          if (trips.isEmpty) {
-            return const Center(child: Text("No hay viajes programados hoy."));
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: trips.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final trip = trips[index];
-              return TripCard(
-                trip: trip,
-                isOperator: isOperatorMode,
+          body: tripsAsync.when(
+            data: (trips) {
+              if (trips.isEmpty) {
+                return const Center(child: Text("No hay viajes programados hoy."));
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: trips.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                itemBuilder: (context, index) {
+                  final trip = trips[index];
+                  return TripCard(
+                    trip: trip,
+                    isOperator: isOperator,
+                  );
+                },
               );
             },
-          );
-        },
-        error: (err, stack) => Center(child: Text('Error: $err')),
-        loading: () => const Center(child: CircularProgressIndicator()),
-      ),
-      floatingActionButton: isOperatorMode
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                // TODO: Implementar creación de viaje
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Crear viaje (Próximamente)')),
-                );
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Nuevo Viaje'),
-            )
-          : null,
+            error: (err, stack) => Center(child: Text('Error: $err')),
+            loading: () => const Center(child: CircularProgressIndicator()),
+          ),
+          floatingActionButton: isOperator
+              ? FloatingActionButton.extended(
+                  onPressed: () {
+                    // TODO: Implementar creación de viaje
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Crear viaje (Próximamente)')),
+                    );
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Nuevo Viaje'),
+                )
+              : null,
+        );
+      },
     );
   }
 }
