@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   db:
-    image: supabase/postgres:latest
+    image: supabase/postgres:15.1.1.2
     container_name: aquaruta-db
     restart: unless-stopped
     env_file:
@@ -13,7 +11,7 @@ services:
       - db-data:/var/lib/postgresql/data
 
   auth:
-    image: supabase/gotrue:latest
+    image: supabase/gotrue:v2.158.1
     container_name: aquaruta-auth
     restart: unless-stopped
     depends_on:
@@ -24,7 +22,7 @@ services:
       - "9999:9999"
 
   rest:
-    image: postgrest/postgrest:latest
+    image: postgrest/postgrest:v12.2.0
     container_name: aquaruta-rest
     restart: unless-stopped
     depends_on:
@@ -35,7 +33,7 @@ services:
       - "3001:3000"
 
   realtime:
-    image: supabase/realtime:latest
+    image: supabase/realtime:v2.30.23
     container_name: aquaruta-realtime
     restart: unless-stopped
     depends_on:
@@ -46,7 +44,7 @@ services:
       - "4000:4000"
 
   storage:
-    image: supabase/storage-api:latest
+    image: supabase/storage-api:v1.11.13
     container_name: aquaruta-storage
     restart: unless-stopped
     depends_on:
@@ -57,8 +55,19 @@ services:
     ports:
       - "5000:5000"
 
+  imgproxy:
+    image: darthsim/imgproxy:v3.8.0
+    container_name: aquaruta-imgproxy
+    restart: unless-stopped
+    depends_on:
+      - storage
+    env_file:
+      - .env
+    ports:
+      - "8081:8080"
+
   meta:
-    image: supabase/postgres-meta:latest
+    image: supabase/postgres-meta:v0.83.2
     container_name: aquaruta-meta
     restart: unless-stopped
     depends_on:
@@ -69,7 +78,7 @@ services:
       - "8080:8080"
 
   studio:
-    image: supabase/studio:latest
+    image: supabase/studio:20241202-b258277
     container_name: aquaruta-studio
     restart: unless-stopped
     depends_on:
