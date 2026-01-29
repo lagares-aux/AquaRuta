@@ -5,13 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants.dart';
-import 'core/utils/router_stream.dart';
+import 'core/utils/router_stream.dart'; // Asegúrate de tener este archivo del paso anterior
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
-import 'features/trips/data/models/trip_model.dart';
 import 'features/trips/presentation/pages/home_page.dart';
 import 'features/trips/presentation/pages/trip_details_page.dart';
+import 'features/trips/data/models/trip_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,8 +29,29 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Escuchamos el estado de autenticación
+    final authState = ref.watch(authStateProvider);
+
     final router = GoRouter(
       initialLocation: '/',
+      refreshListenable: GoRouterRefreshStream(authState.stream),
+      redirect: (context, state) {
+        final session = Supabase.instance.client.auth.currentSession;
+        final loggingIn = state.uri.toString() == '/login';
+        final registering = state.uri.toString() == '/register';
+
+        // Si no hay sesión y no estamos en login/registro -> Login
+        if (session == null) {
+          if (!loggingIn && !registering) return '/login';
+        }
+
+        // Si hay sesión y estamos en login/registro -> Home
+        if (session != null) {
+          if (loggingIn || registering) return '/';
+        }
+
+        return null;
+      },
       routes: [
         GoRoute(
           path: '/',
@@ -47,11 +68,8 @@ class MyApp extends ConsumerWidget {
         GoRoute(
           path: '/trip-details',
           builder: (context, state) {
-            final extra = state.extra;
-            if (extra is! TripModel) {
-              return const HomePage();
-            }
-            return TripDetailsPage(trip: extra);
+            final trip = state.extra as TripModel;
+            return TripDetailsPage(trip: trip);
           },
         ),
       ],
@@ -59,8 +77,8 @@ class MyApp extends ConsumerWidget {
 
     final colorScheme = ColorScheme.fromSeed(
       seedColor: const Color(0xFF006994),
-      primary: const Color(0xFF006994), // Azul Oc1ano
-      secondary: const Color(0xFF40E0D0), // Turquesa
+      primary: const Color(0xFF006994),
+      secondary: const Color(0xFF40E0D0),
       brightness: Brightness.light,
     );
 
@@ -74,15 +92,7 @@ class MyApp extends ConsumerWidget {
         colorScheme: colorScheme,
         textTheme: textTheme,
         useMaterial3: true,
-        appBarTheme: AppBarTheme(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: colorScheme.secondary,
-          foregroundColor: Colors.black,
-        ),
+        scaffoldBackgroundColor: Colors.white,
       ),
     );
   }
