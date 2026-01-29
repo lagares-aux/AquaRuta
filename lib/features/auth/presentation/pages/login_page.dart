@@ -35,40 +35,41 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     final authController = ref.read(authControllerProvider.notifier);
 
-    try {
-      await authController.signIn(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+    await authController.signIn(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
-      final state = ref.read(authControllerProvider);
-      if (state.hasError) {
-        throw state.error!;
-      }
-
-      if (mounted) {
-        context.go('/');
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al iniciar sesión: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    ref.listen<AsyncValue>(authControllerProvider, (previous, next) {
+      if (next is AsyncError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${next.error}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
+      if (next is AsyncData) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('¡Inicio de sesión exitoso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       body: Container(
