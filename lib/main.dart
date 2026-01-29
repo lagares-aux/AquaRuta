@@ -5,6 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/constants.dart';
+import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/register_page.dart';
+import 'features/auth/presentation/providers/auth_provider.dart';
 import 'features/trips/presentation/pages/home_page.dart';
 
 Future<void> main() async {
@@ -23,6 +26,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authAsync = ref.watch(authStateProvider);
+    final user = authAsync.value;
+
     final router = GoRouter(
       initialLocation: '/',
       routes: [
@@ -30,7 +36,41 @@ class MyApp extends ConsumerWidget {
           path: '/',
           builder: (context, state) => const HomePage(),
         ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const RegisterPage(),
+        ),
       ],
+      redirect: (context, state) {
+        final loggingIn = state.subloc == '/login';
+        final registering = state.subloc == '/register';
+
+        // Mientras el estado de auth está cargando, no redirigir.
+        if (authAsync.isLoading) {
+          return null;
+        }
+
+        if (user == null) {
+          // No autenticado: solo permitir login y register.
+          if (!loggingIn && !registering) {
+            return '/login';
+          }
+          return null;
+        }
+
+        // Autenticado: evitar login/register.
+        if (loggingIn || registering) {
+          return '/';
+        }
+
+        return null;
+      },
+      refreshListenable:
+          GoRouterRefreshStream(ref.watch(authStateProvider.stream)),
     );
 
     final colorScheme = ColorScheme.fromSeed(
