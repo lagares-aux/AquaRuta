@@ -9,25 +9,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   # Core
   supabase_flutter: ^2.8.0
   go_router: ^14.0.0
   google_fonts: ^6.2.1
   intl: ^0.19.0
-  
-  # State Management (Riverpod v2 Stable)
+
+  # State Management (Riverpod v2)
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
-  
-  # Code Generation
+
+  flutter_lints: ^4.0.0
+
+  # Code Generation & Linting (COMPATIBLE)
   build_runner: ^2.4.13
-  riverpod_generator: ^2.6.3
-  custom_lint: ^0.6.4
+  riverpod_generator: ^2.6.4
+  custom_lint: ^0.7.6
   riverpod_lint: ^2.6.1
 
 flutter:
